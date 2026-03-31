@@ -8,7 +8,6 @@ const cookieParser = require("cookie-parser");
 const app = express();
 
 // 🛡️ 1. SECURITY HEADERS & CORS FIRST
-app.use(cors());
 const allowedOrigins = [
   "http://127.0.0.1:5500",
   "http://127.0.0.1:5501", // Your current local port
