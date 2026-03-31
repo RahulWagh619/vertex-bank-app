@@ -322,38 +322,47 @@ btnClose.addEventListener("click", async function (e) {
 
   const confirmUsername = inputCloseUsername.value;
   const confirmPin = inputClosePin.value;
+  const token = localStorage.getItem("jwt"); // 🔑 Retrieve the key
 
   if (confirmUsername && confirmPin) {
     if (
       confirm(
-        `Are you sure you want to permanently delete your account, ${confirmUsername}?`,
+        `Are you sure you want to permanently delete your account, ${confirmUsername}? This action cannot be undone.`,
       )
     ) {
       try {
-        const response = await fetch(
-          "http://127.0.0.1:5000/api/users/close-account",
-          {
-            method: "DELETE", // 🛡️ Using the DELETE method
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ confirmUsername, confirmPin }),
-            credentials: "include",
+        // 🌍 1. Use API_URL instead of 127.0.0.1
+        const response = await fetch(`${API_URL}/close-account`, {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`, // ✅ 2. Show the ID Card
           },
-        );
+          body: JSON.stringify({ confirmUsername, confirmPin }),
+          credentials: "include",
+        });
 
+        // 3. Handle the response
         if (response.status === 204) {
-          // 1. Hide UI
+          // Success: No Content (standard for DELETE)
           containerApp.style.opacity = 0;
           labelWelcome.textContent = "Log in to get started";
-
-          // 2. Clear inputs
           inputCloseUsername.value = inputClosePin.value = "";
+
+          // Clear the token since the account is gone
+          localStorage.removeItem("jwt");
+
           alert("Account successfully closed. We are sorry to see you go! 👋");
         } else {
+          // If the status isn't 204, the server likely sent an error message
           const data = await response.json();
-          alert(data.message);
+          alert(
+            data.message || "Could not close account. Please check your PIN.",
+          );
         }
       } catch (err) {
-        alert("Could not close account. Check server connection.");
+        console.error("Close Account Error:", err);
+        alert("Could not connect to the server. Please check your internet.");
       }
     }
   }
