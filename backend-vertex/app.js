@@ -9,20 +9,31 @@ const app = express();
 
 // 🛡️ 1. SECURITY HEADERS & CORS FIRST
 app.use(cors());
-app.use((req, res, next) => {
-  res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader(
-    "Access-Control-Allow-Methods",
-    "GET, POST, PUT, DELETE, OPTIONS",
-  );
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
+const allowedOrigins = [
+  "http://127.0.0.1:5500",
+  "http://127.0.0.1:5501", // Your current local port
+  "https://your-vertex-bank.vercel.app", // Your live Vercel link
+];
 
-  // If the browser sends an OPTIONS request, respond with 200 OK immediately
-  if (req.method === "OPTIONS") {
-    return res.status(200).end();
-  }
-  next();
-});
+app.use(
+  cors({
+    origin: function (origin, callback) {
+      // Allow requests with no origin (like mobile apps or postman)
+      if (!origin) return callback(null, true);
+
+      if (allowedOrigins.indexOf(origin) === -1) {
+        return callback(
+          new Error("CORS Policy: This origin is not allowed"),
+          false,
+        );
+      }
+      return callback(null, true);
+    },
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+    credentials: true, // 👈 THIS must be true to match your frontend
+  }),
+);
 app.use(helmet());
 
 // 🛡️ 2. RATE LIMITING (Prevents Brute Force)
