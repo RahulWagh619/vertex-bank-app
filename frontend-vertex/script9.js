@@ -183,88 +183,102 @@ const startLogOutTimer = function () {
 btnLogin.addEventListener("click", async function (e) {
   e.preventDefault();
 
+  const username = inputLoginUsername.value;
+  const pin = inputLoginPin.value;
+
+  if (!username || !pin) {
+    alert("Please enter both username and PIN");
+    return;
+  }
+
   try {
+    console.log("Attempting login at:", `${API_URL}/login`);
+
     const response = await fetch(`${API_URL}/login`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+      },
       body: JSON.stringify({
-        username: inputLoginUsername.value,
-        pin: inputLoginPin.value,
+        username: username,
+        pin: pin,
       }),
-      credentials: "include", // 🛡️ CRITICAL: Hands over the JWT Cookie
+      // 'include' is used if your backend sends cookies,
+      // but we will also store the token manually for headers.
+      credentials: "include",
     });
 
     const data = await response.json();
 
     if (data.status === "success") {
+      // 🛡️ 1. SAVE THE SECURITY TOKEN
+      // This is the "Key" we will show the server for Transfers/Loans
+      localStorage.setItem("jwt", data.token);
+
+      // 2. SET THE CURRENT ACCOUNT
       currentAccount = data.data.user;
 
-      // UI Updates
+      // 3. UI UPDATES
       labelWelcome.textContent = `Welcome back, ${currentAccount.name.split(" ")[0]}`;
-      containerApp.style.opacity = 100;
+      containerApp.style.opacity = 1; // Show the app
 
-      // Clear inputs
+      // 4. CLEAR INPUTS & FOCUS
       inputLoginUsername.value = inputLoginPin.value = "";
       inputLoginPin.blur();
 
-      // Start Logic
+      // 5. INITIALIZE APP STATE
       if (timer) clearInterval(timer);
       timer = startLogOutTimer();
+
+      // Update the balance, movements, and summary
       updateUI(currentAccount);
+
+      console.log("Login successful! Token saved to localStorage.");
     } else {
-      alert(data.message);
+      // Show the specific error from your backend (e.g., "Incorrect PIN")
+      alert(data.message || "Login failed");
     }
   } catch (err) {
     console.error("Connection Error 💥", err);
-    alert(`Could not connect to bank: ${err.message}`);
+    alert("Could not connect to the bank server. Please try again later.");
   }
 });
 
 btnTransfer.addEventListener("click", async function (e) {
   e.preventDefault();
-
   const amount = +inputTransferAmount.value;
   const targetUsername = inputTransferTo.value;
-  // 🛡️ Get the PIN value
   const pin = inputTransferPin.value;
+  const token = localStorage.getItem("jwt"); // 🔑 Get the key
 
   try {
-    const response = await fetch("http://127.0.0.1:5000/api/users/transfer", {
+    // 🌍 Use API_URL, not localhost!
+    const response = await fetch(`${API_URL}/transfer`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`, // ✅ Send the key to the server
+      },
       body: JSON.stringify({
-        recipientUsername: inputTransferTo.value, // 🛡️ MATCH THIS TO THE ERROR
-        amount: +inputTransferAmount.value,
-        pin: inputTransferPin.value, //Now the backend will finally receive the PIN!
+        recipientUsername: targetUsername,
+        amount: amount,
+        pin: pin,
       }),
       credentials: "include",
     });
 
     const data = await response.json();
-    console.log("--- SERVER RESPONSE ---", data);
 
     if (data.status === "success") {
-      // updateUI(currentAccount);
-      // ... success logic
-    } else {
-      // 🛡️ Better error fallback
-      alert(data.message || "The server sent an error but forgot the message!");
-    }
-    if (data.status === "success") {
-      // Clear all fields including the new PIN
+      currentAccount = data.data.user;
+      updateUI(currentAccount);
       inputTransferAmount.value =
         inputTransferTo.value =
         inputTransferPin.value =
           "";
-      sorted = false;
-
-      currentAccount = data.data.user;
-      if (timer) clearInterval(timer);
-      timer = startLogOutTimer();
-      updateUI(currentAccount);
       alert("Transfer Successful! ✅");
     } else {
-      alert(data.message); // This will now correctly show "Incorrect PIN"
+      alert(data.message);
     }
   } catch (err) {
     alert("Transfer failed. Please check connection.");
@@ -272,34 +286,31 @@ btnTransfer.addEventListener("click", async function (e) {
 });
 btnLoan.addEventListener("click", async function (e) {
   e.preventDefault();
-
   const amount = Math.floor(inputLoanAmount.value);
-  const pin = inputLoanPin.value; // 🛡️ Capture the PIN
+  const pin = inputLoanPin.value;
+  const token = localStorage.getItem("jwt");
 
   if (amount > 0) {
     try {
       const response = await fetch(`${API_URL}/request-loan`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ amount, pin }), // 🛡️ Send the PIN
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`, // ✅ Added
+        },
+        body: JSON.stringify({ amount, pin }),
         credentials: "include",
       });
 
       const data = await response.json();
 
       if (data.status === "success") {
-        sorted = false;
         currentAccount = data.data.user;
-        if (timer) clearInterval(timer);
-        timer = startLogOutTimer();
         updateUI(currentAccount);
-
-        // Clear fields
         inputLoanAmount.value = inputLoanPin.value = "";
         alert(data.message);
       } else {
-        // This will now show your validation errors
-        alert(data.message || (data.errors ? data.errors[0].msg : "Error"));
+        alert(data.message);
       }
     } catch (err) {
       alert("Loan request failed.");
