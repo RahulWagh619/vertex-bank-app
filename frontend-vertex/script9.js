@@ -1,44 +1,44 @@
-'use strict';
+"use strict";
 
 // --- ELEMENTS ---
-const labelWelcome = document.querySelector('.welcome');
-const labelDate = document.querySelector('.date');
-const labelBalance = document.querySelector('.balance__value');
-const labelSumIn = document.querySelector('.summary__value--in');
-const labelSumOut = document.querySelector('.summary__value--out');
-const labelSumInterest = document.querySelector('.summary__value--interest');
+const labelWelcome = document.querySelector(".welcome");
+const labelDate = document.querySelector(".date");
+const labelBalance = document.querySelector(".balance__value");
+const labelSumIn = document.querySelector(".summary__value--in");
+const labelSumOut = document.querySelector(".summary__value--out");
+const labelSumInterest = document.querySelector(".summary__value--interest");
 // const labelLastLogin = document.querySelector('.login-date');
-const labelTimer = document.querySelector('.timer');
+const labelTimer = document.querySelector(".timer");
 
-const containerApp = document.querySelector('.app');
-const containerMovements = document.querySelector('.movements');
+const containerApp = document.querySelector(".app");
+const containerMovements = document.querySelector(".movements");
 
-const btnLogin = document.querySelector('.login__btn');
-const btnTransfer = document.querySelector('.form__btn--transfer');
-const btnLoan = document.querySelector('.form__btn--loan');
-const btnClose = document.querySelector('.form__btn--close');
-const btnSort = document.querySelector('.btn--sort');
+const btnLogin = document.querySelector(".login__btn");
+const btnTransfer = document.querySelector(".form__btn--transfer");
+const btnLoan = document.querySelector(".form__btn--loan");
+const btnClose = document.querySelector(".form__btn--close");
+const btnSort = document.querySelector(".btn--sort");
 
-const inputLoginUsername = document.querySelector('.login__input--user');
-const inputLoginPin = document.querySelector('.login__input--pin');
-const inputTransferTo = document.querySelector('.form__input--to');
-const inputTransferAmount = document.querySelector('.form__input--amount');
-const inputTransferPin = document.querySelector('.form__input--transfer-pin');
-const inputLoanAmount = document.querySelector('.form__input--loan-amount');
-const inputLoanPin = document.querySelector('.form__input--loan-pin');
-const inputCloseUsername = document.querySelector('.form__input--user');
-const inputClosePin = document.querySelector('.form__input--pin');
+const inputLoginUsername = document.querySelector(".login__input--user");
+const inputLoginPin = document.querySelector(".login__input--pin");
+const inputTransferTo = document.querySelector(".form__input--to");
+const inputTransferAmount = document.querySelector(".form__input--amount");
+const inputTransferPin = document.querySelector(".form__input--transfer-pin");
+const inputLoanAmount = document.querySelector(".form__input--loan-amount");
+const inputLoanPin = document.querySelector(".form__input--loan-pin");
+const inputCloseUsername = document.querySelector(".form__input--user");
+const inputClosePin = document.querySelector(".form__input--pin");
 
 // --- STATE ---
 let currentAccount, timer;
 let sorted = false;
-const API_URL = 'http://127.0.0.1:5000/api/users'; // 🌐 Centralized API Path
+const API_URL = "https://vertex-bank-app.onrender.com/api/users"; // 🌐 Centralized API Path
 
 // --- FUNCTIONS ---
 
-const formatCurr = (value, locale = 'en-US', currency = 'USD') => {
+const formatCurr = (value, locale = "en-US", currency = "USD") => {
   return new Intl.NumberFormat(locale, {
-    style: 'currency',
+    style: "currency",
     currency: currency,
   }).format(value);
 };
@@ -47,14 +47,14 @@ const formatDate = (date, locale) => {
   const daysPassed = (date1, date2) =>
     Math.round(Math.abs(date2 - date1) / (24 * 60 * 60 * 1000));
   const diff = daysPassed(new Date(), date);
-  if (diff === 0) return 'Today';
-  if (diff === 1) return 'Yesterday';
+  if (diff === 0) return "Today";
+  if (diff === 1) return "Yesterday";
   if (diff <= 7) return `${diff} days ago`;
   return new Intl.DateTimeFormat(locale).format(date);
 };
 
 const displayMovements = function (acc, sort = false) {
-  containerMovements.innerHTML = '';
+  containerMovements.innerHTML = "";
 
   // 1. Glue movements and dates together
   const movs = acc.movements || [];
@@ -74,9 +74,9 @@ const displayMovements = function (acc, sort = false) {
   // 3. Render the sorted (or unsorted) list
   combined.forEach((obj, i) => {
     const { movement, movementDate } = obj;
-    const type = movement > 0 ? 'deposit' : 'withdrawal';
+    const type = movement > 0 ? "deposit" : "withdrawal";
     const date = new Date(movementDate);
-    const displayDate = formatDate(date, acc.locale || 'en-US');
+    const displayDate = formatDate(date, acc.locale || "en-US");
 
     const html = `
       <div class="movements__row">
@@ -85,7 +85,7 @@ const displayMovements = function (acc, sort = false) {
         <div class="movements__value">${formatCurr(movement, acc.locale, acc.currency)}</div>
       </div>`;
 
-    containerMovements.insertAdjacentHTML('afterbegin', html);
+    containerMovements.insertAdjacentHTML("afterbegin", html);
   });
 };
 
@@ -102,17 +102,17 @@ const calcDisplayBalance = function (acc) {
 const calcDisplaySummary = function (acc) {
   const movs = acc.movements || [];
   const incomes = movs
-    .filter(mov => mov > 0)
+    .filter((mov) => mov > 0)
     .reduce((acc, mov) => acc + mov, 0);
   labelSumIn.textContent = formatCurr(incomes, acc.locale, acc.currency);
 
-  const out = movs.filter(mov => mov < 0).reduce((acc, mov) => acc + mov, 0);
+  const out = movs.filter((mov) => mov < 0).reduce((acc, mov) => acc + mov, 0);
   labelSumOut.textContent = formatCurr(Math.abs(out), acc.locale, acc.currency);
 
   const interest = movs
-    .filter(mov => mov > 0)
-    .map(deposit => (deposit * (acc.interestRate || 1.2)) / 100)
-    .filter(int => int >= 1)
+    .filter((mov) => mov > 0)
+    .map((deposit) => (deposit * (acc.interestRate || 1.2)) / 100)
+    .filter((int) => int >= 1)
     .reduce((acc, int) => acc + int, 0);
   labelSumInterest.textContent = formatCurr(interest, acc.locale, acc.currency);
 };
@@ -141,7 +141,7 @@ const calcDisplaySummary = function (acc) {
 // };
 
 const updateUI = function (acc) {
-  console.log('Refreshing Dashboard... 🔄');
+  console.log("Refreshing Dashboard... 🔄");
   displayMovements(acc);
   calcDisplayBalance(acc);
   calcDisplaySummary(acc);
@@ -159,7 +159,7 @@ const startLogOutTimer = function () {
     // 2. When 0 seconds, stop timer and log out user
     if (time === 0) {
       clearInterval(timer);
-      labelWelcome.textContent = 'Log in to get started';
+      labelWelcome.textContent = "Log in to get started";
       containerApp.style.opacity = 0;
       // Optional: Send a request to backend to clear the cookie
     }
@@ -180,31 +180,31 @@ const startLogOutTimer = function () {
 
 // --- EVENT HANDLERS ---
 
-btnLogin.addEventListener('click', async function (e) {
+btnLogin.addEventListener("click", async function (e) {
   e.preventDefault();
 
   try {
     const response = await fetch(`${API_URL}/login`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         username: inputLoginUsername.value,
         pin: inputLoginPin.value,
       }),
-      credentials: 'include', // 🛡️ CRITICAL: Hands over the JWT Cookie
+      credentials: "include", // 🛡️ CRITICAL: Hands over the JWT Cookie
     });
 
     const data = await response.json();
 
-    if (data.status === 'success') {
+    if (data.status === "success") {
       currentAccount = data.data.user;
 
       // UI Updates
-      labelWelcome.textContent = `Welcome back, ${currentAccount.name.split(' ')[0]}`;
+      labelWelcome.textContent = `Welcome back, ${currentAccount.name.split(" ")[0]}`;
       containerApp.style.opacity = 100;
 
       // Clear inputs
-      inputLoginUsername.value = inputLoginPin.value = '';
+      inputLoginUsername.value = inputLoginPin.value = "";
       inputLoginPin.blur();
 
       // Start Logic
@@ -215,12 +215,12 @@ btnLogin.addEventListener('click', async function (e) {
       alert(data.message);
     }
   } catch (err) {
-    console.error('Connection Error 💥', err);
+    console.error("Connection Error 💥", err);
     alert(`Could not connect to bank: ${err.message}`);
   }
 });
 
-btnTransfer.addEventListener('click', async function (e) {
+btnTransfer.addEventListener("click", async function (e) {
   e.preventDefault();
 
   const amount = +inputTransferAmount.value;
@@ -229,48 +229,48 @@ btnTransfer.addEventListener('click', async function (e) {
   const pin = inputTransferPin.value;
 
   try {
-    const response = await fetch('http://127.0.0.1:5000/api/users/transfer', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+    const response = await fetch("http://127.0.0.1:5000/api/users/transfer", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         recipientUsername: inputTransferTo.value, // 🛡️ MATCH THIS TO THE ERROR
         amount: +inputTransferAmount.value,
         pin: inputTransferPin.value, //Now the backend will finally receive the PIN!
       }),
-      credentials: 'include',
+      credentials: "include",
     });
 
     const data = await response.json();
-    console.log('--- SERVER RESPONSE ---', data);
+    console.log("--- SERVER RESPONSE ---", data);
 
-    if (data.status === 'success') {
+    if (data.status === "success") {
       // updateUI(currentAccount);
       // ... success logic
     } else {
       // 🛡️ Better error fallback
-      alert(data.message || 'The server sent an error but forgot the message!');
+      alert(data.message || "The server sent an error but forgot the message!");
     }
-    if (data.status === 'success') {
+    if (data.status === "success") {
       // Clear all fields including the new PIN
       inputTransferAmount.value =
         inputTransferTo.value =
         inputTransferPin.value =
-          '';
+          "";
       sorted = false;
 
       currentAccount = data.data.user;
       if (timer) clearInterval(timer);
       timer = startLogOutTimer();
       updateUI(currentAccount);
-      alert('Transfer Successful! ✅');
+      alert("Transfer Successful! ✅");
     } else {
       alert(data.message); // This will now correctly show "Incorrect PIN"
     }
   } catch (err) {
-    alert('Transfer failed. Please check connection.');
+    alert("Transfer failed. Please check connection.");
   }
 });
-btnLoan.addEventListener('click', async function (e) {
+btnLoan.addEventListener("click", async function (e) {
   e.preventDefault();
 
   const amount = Math.floor(inputLoanAmount.value);
@@ -279,15 +279,15 @@ btnLoan.addEventListener('click', async function (e) {
   if (amount > 0) {
     try {
       const response = await fetch(`${API_URL}/request-loan`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ amount, pin }), // 🛡️ Send the PIN
-        credentials: 'include',
+        credentials: "include",
       });
 
       const data = await response.json();
 
-      if (data.status === 'success') {
+      if (data.status === "success") {
         sorted = false;
         currentAccount = data.data.user;
         if (timer) clearInterval(timer);
@@ -295,18 +295,18 @@ btnLoan.addEventListener('click', async function (e) {
         updateUI(currentAccount);
 
         // Clear fields
-        inputLoanAmount.value = inputLoanPin.value = '';
+        inputLoanAmount.value = inputLoanPin.value = "";
         alert(data.message);
       } else {
         // This will now show your validation errors
-        alert(data.message || (data.errors ? data.errors[0].msg : 'Error'));
+        alert(data.message || (data.errors ? data.errors[0].msg : "Error"));
       }
     } catch (err) {
-      alert('Loan request failed.');
+      alert("Loan request failed.");
     }
   }
 });
-btnClose.addEventListener('click', async function (e) {
+btnClose.addEventListener("click", async function (e) {
   e.preventDefault();
 
   const confirmUsername = inputCloseUsername.value;
@@ -320,34 +320,34 @@ btnClose.addEventListener('click', async function (e) {
     ) {
       try {
         const response = await fetch(
-          'http://127.0.0.1:5000/api/users/close-account',
+          "http://127.0.0.1:5000/api/users/close-account",
           {
-            method: 'DELETE', // 🛡️ Using the DELETE method
-            headers: { 'Content-Type': 'application/json' },
+            method: "DELETE", // 🛡️ Using the DELETE method
+            headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ confirmUsername, confirmPin }),
-            credentials: 'include',
+            credentials: "include",
           },
         );
 
         if (response.status === 204) {
           // 1. Hide UI
           containerApp.style.opacity = 0;
-          labelWelcome.textContent = 'Log in to get started';
+          labelWelcome.textContent = "Log in to get started";
 
           // 2. Clear inputs
-          inputCloseUsername.value = inputClosePin.value = '';
-          alert('Account successfully closed. We are sorry to see you go! 👋');
+          inputCloseUsername.value = inputClosePin.value = "";
+          alert("Account successfully closed. We are sorry to see you go! 👋");
         } else {
           const data = await response.json();
           alert(data.message);
         }
       } catch (err) {
-        alert('Could not close account. Check server connection.');
+        alert("Could not close account. Check server connection.");
       }
     }
   }
 });
-btnSort.addEventListener('click', function (e) {
+btnSort.addEventListener("click", function (e) {
   e.preventDefault();
 
   // Toggle the state (if it's true, make it false, and vice versa)

@@ -10,7 +10,7 @@ html {
 }
 
 body {
-  font-family: 'Poppins', sans-serif;
+  font-family: "Poppins", sans-serif;
   color: #c9d1d9;
   /* Deep radial gradient instead of flat black */
   background: radial-gradient(circle at top left, #1c2128, #0d1117 80%);
@@ -264,7 +264,7 @@ nav {
 
 /* Inner dark shape that creates the "border" illusion */
 .operation::before {
-  content: '';
+  content: "";
   position: absolute;
   inset: 2px; /* This defines the border thickness (2px) */
   background-color: #161b22; /* Dark card background */
