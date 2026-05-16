@@ -16,24 +16,68 @@
   </head>
   <body>
     <nav>
-      <p class="welcome">Authenticate to Vertex Node</p>
-      <img src="img-created-1.png" alt="Logo" class="logo" />
-      <form class="login">
-        <input
-          type="text"
-          placeholder="user"
-          class="login__input login__input--user"
-        />
-        <input
-          type="password"
-          placeholder="PIN"
-          maxlength="4"
-          class="login__input login__input--pin"
-        />
-        <button class="login__btn">&rarr;</button>
-      </form>
+      <div id="screen-home" class="auth-container">
+        <img src="img-created-1.png" alt="Vertex Bank Logo" class="auth-logo" />
+        <h2>Welcome to Vertex Bank</h2>
+        <p>Please select an option to manage your finances</p>
+        <div class="auth-buttons">
+          <button id="btn-go-to-login" class="nav-btn">Log In</button>
+          <button id="btn-go-to-signup" class="nav-btn">Create Account</button>
+        </div>
+      </div>
+
+      <div id="screen-signup" class="auth-container hidden">
+        <h2>Create Your Account</h2>
+        <form class="signup-form">
+          <input
+            type="text"
+            placeholder="Full Name"
+            id="signup-name"
+            class="login__input"
+          />
+          <input
+            type="text"
+            placeholder="Desired Username"
+            id="signup-user"
+            class="login__input"
+          />
+          <input
+            type="password"
+            maxlength="4"
+            placeholder="4-Digit PIN"
+            id="signup-pin"
+            class="login__input"
+          />
+          <button id="btn-submit-signup" class="action-btn">
+            Sign Up &rarr;
+          </button>
+        </form>
+        <button class="btn-back">&larr; Back</button>
+      </div>
+
+      <div id="screen-login" class="auth-container hidden">
+        <h2>Access Your Vault</h2>
+        <form class="login-form">
+          <input
+            type="text"
+            placeholder="Username"
+            id="login-user"
+            class="login__input"
+          />
+          <input
+            type="password"
+            maxlength="4"
+            placeholder="PIN"
+            id="login-pin"
+            class="login__input"
+          />
+          <button id="btn-submit-login" class="action-btn">Login &rarr;</button>
+        </form>
+        <button class="btn-back">&larr; Back</button>
+      </div>
     </nav>
 
+    <p class="welcome hidden">Welcome back, User</p>
     <main class="app">
       <div class="balance">
         <div>

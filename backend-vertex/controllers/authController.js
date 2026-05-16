@@ -1,9 +1,9 @@
-const jwt = require('jsonwebtoken');
-const User = require('../models/User');
-const bcrypt = require('bcryptjs');
+const jwt = require("jsonwebtoken");
+const User = require("../models/User");
+const bcrypt = require("bcryptjs");
 
 // HELPER FUNCTION: To sign the "Passport"
-const signToken = id => {
+const signToken = (id) => {
   return jwt.sign({ id: id }, process.env.JWT_SECRET, {
     expiresIn: process.env.JWT_EXPIRES_IN,
   });
@@ -18,17 +18,17 @@ const createSendToken = (user, statusCode, req, res) => {
     ),
     httpOnly: true,
     // Now 'req' is defined and works!
-    secure: req.secure || req.headers['x-forwarded-proto'] === 'https',
-    sameSite: 'Lax',
+    secure: req.secure || req.headers["x-forwarded-proto"] === "https",
+    sameSite: "Lax",
   };
 
-  res.cookie('jwt', token, cookieOptions);
+  res.cookie("jwt", token, cookieOptions);
 
   // Remove password from output
   user.password = undefined;
 
   res.status(statusCode).json({
-    status: 'success',
+    status: "success",
     token,
     data: { user },
   });
@@ -41,13 +41,13 @@ exports.login = async (req, res) => {
     if (!username || !pin) {
       return res
         .status(400)
-        .json({ message: 'Please provide username and pin' });
+        .json({ message: "Please provide username and pin" });
     }
 
-    const user = await User.findOne({ username }).select('+pin');
+    const user = await User.findOne({ username }).select("+pin");
 
     if (!user || !(await user.correctPin(pin, user.pin))) {
-      return res.status(401).json({ message: 'Incorrect username or pin' });
+      return res.status(401).json({ message: "Incorrect username or pin" });
     }
     user.lastLogin = Date.now();
     await user.save({ validateBeforeSave: false });
@@ -55,7 +55,7 @@ exports.login = async (req, res) => {
     // 🛡️ Use the helper here too!
     createSendToken(user, 200, req, res);
   } catch (err) {
-    res.status(500).json({ status: 'error', message: err.message });
+    res.status(500).json({ status: "error", message: err.message });
   }
 };
 
@@ -72,11 +72,11 @@ exports.signup = async (req, res) => {
     // 🛡️ Use the helper to sign token and send cookie
     createSendToken(newUser, 201, req, res);
   } catch (err) {
-    res.status(400).json({ status: 'fail', message: err.message });
+    res.status(400).json({ status: "fail", message: err.message });
   }
 };
 
-const { promisify } = require('util'); // Standard Node tool
+const { promisify } = require("util"); // Standard Node tool
 
 exports.protect = async (req, res, next) => {
   try {
@@ -84,17 +84,17 @@ exports.protect = async (req, res, next) => {
     let token;
     if (
       req.headers.authorization &&
-      req.headers.authorization.startsWith('Bearer')
+      req.headers.authorization.startsWith("Bearer")
     ) {
-      token = req.headers.authorization.split(' ')[1];
+      token = req.headers.authorization.split(" ")[1];
     } else if (req.cookies.jwt) {
       token = req.cookies.jwt;
     }
 
     if (!token) {
       return res.status(401).json({
-        status: 'fail',
-        message: 'You are not logged in! Please login to get access.',
+        status: "fail",
+        message: "You are not logged in! Please login to get access.",
       });
     }
 
@@ -106,8 +106,8 @@ exports.protect = async (req, res, next) => {
     const currentUser = await User.findById(decoded.id);
     if (!currentUser) {
       return res.status(401).json({
-        status: 'fail',
-        message: 'The user belonging to this token no longer exists.',
+        status: "fail",
+        message: "The user belonging to this token no longer exists.",
       });
     }
 
@@ -117,8 +117,8 @@ exports.protect = async (req, res, next) => {
     next();
   } catch (err) {
     res.status(401).json({
-      status: 'fail',
-      message: 'Invalid token. Please log in again!',
+      status: "fail",
+      message: "Invalid token. Please log in again!",
     });
   }
 };
@@ -128,39 +128,39 @@ exports.transferMoney = async (req, res) => {
     const { recipientUsername, amount, pin } = req.body;
     const sender = req.user;
 
-    const user = await User.findById(req.user.id).select('+pin');
+    const user = await User.findById(req.user.id).select("+pin");
 
     if (!(await user.correctPin(pin, user.pin))) {
       return res.status(401).json({
-        status: 'fail',
-        message: 'Incorrect PIN. Transfer cancelled.',
+        status: "fail",
+        message: "Incorrect PIN. Transfer cancelled.",
       });
     }
 
     if (amount <= 0) {
       return res
         .status(400)
-        .json({ status: 'fail', message: 'Amount must be greater than 0' });
+        .json({ status: "fail", message: "Amount must be greater than 0" });
     }
 
     if (sender.balance < amount) {
       return res
         .status(400)
-        .json({ status: 'fail', message: 'Insufficient funds' });
+        .json({ status: "fail", message: "Insufficient funds" });
     }
 
     const receiver = await User.findOne({ username: recipientUsername });
     if (!receiver) {
       return res
         .status(404)
-        .json({ status: 'fail', message: 'Receiver not found' });
+        .json({ status: "fail", message: "Receiver not found" });
     }
 
     // 🛡️ FIX 1: Changed targetUsername to recipientUsername
     if (sender.username === recipientUsername) {
       return res
         .status(400)
-        .json({ status: 'fail', message: 'You cannot send money to yourself' });
+        .json({ status: "fail", message: "You cannot send money to yourself" });
     }
 
     sender.movements = sender.movements || [];
@@ -180,7 +180,7 @@ exports.transferMoney = async (req, res) => {
     await receiver.save({ validateBeforeSave: false });
 
     res.status(200).json({
-      status: 'success',
+      status: "success",
       // 🛡️ FIX 2: Changed targetUsername to recipientUsername
       message: `Successfully transferred $${amount} to ${recipientUsername}`,
       data: {
@@ -188,7 +188,7 @@ exports.transferMoney = async (req, res) => {
       },
     });
   } catch (err) {
-    res.status(500).json({ status: 'error', message: err.message });
+    res.status(500).json({ status: "error", message: err.message });
   }
 };
 exports.requestLoan = async (req, res) => {
@@ -197,17 +197,17 @@ exports.requestLoan = async (req, res) => {
 
     // 🛡️ IMPORTANT: You must verify the PIN manually in the controller
     // because the middleware only checked the LENGTH, not if it's CORRECT.
-    const user = await User.findById(req.user.id).select('+pin');
+    const user = await User.findById(req.user.id).select("+pin");
 
     if (!(await user.correctPin(pin, user.pin))) {
-      return res.status(401).json({ status: 'fail', message: 'Incorrect PIN' });
+      return res.status(401).json({ status: "fail", message: "Incorrect PIN" });
     }
 
     // ... your 10% deposit check logic here ...
-    const hasEnoughDeposit = user.movements.some(mov => mov >= amount * 0.1);
+    const hasEnoughDeposit = user.movements.some((mov) => mov >= amount * 0.1);
 
     if (!hasEnoughDeposit) {
-      return res.status(400).json({ status: 'fail', message: 'Loan denied.' });
+      return res.status(400).json({ status: "fail", message: "Loan denied." });
     }
 
     // 3. Update User Data
@@ -219,31 +219,31 @@ exports.requestLoan = async (req, res) => {
     await user.save({ validateBeforeSave: false });
 
     res.status(200).json({
-      status: 'success',
-      message: 'Loan approved! 🏦',
+      status: "success",
+      message: "Loan approved! 🏦",
       data: { user },
     });
   } catch (err) {
-    res.status(500).json({ status: 'error', message: err.message });
+    res.status(500).json({ status: "error", message: err.message });
   }
 };
 exports.closeAccount = async (req, res) => {
   try {
     const { confirmUsername, confirmPin } = req.body;
-    const user = await User.findById(req.user.id).select('+pin');
+    const user = await User.findById(req.user.id).select("+pin");
 
     // 1. Verify Username matches the logged-in user
     if (confirmUsername !== user.username) {
       return res
         .status(400)
-        .json({ status: 'fail', message: 'Username does not match!' });
+        .json({ status: "fail", message: "Username does not match!" });
     }
 
     // 2. Verify PIN
     if (!(await user.correctPin(confirmPin, user.pin))) {
       return res.status(401).json({
-        status: 'fail',
-        message: 'Incorrect PIN. Account closure aborted.',
+        status: "fail",
+        message: "Incorrect PIN. Account closure aborted.",
       });
     }
 
@@ -252,10 +252,10 @@ exports.closeAccount = async (req, res) => {
 
     // 4. Send success and "log out" the user on the frontend
     res.status(204).json({
-      status: 'success',
+      status: "success",
       data: null,
     });
   } catch (err) {
-    res.status(500).json({ status: 'error', message: err.message });
+    res.status(500).json({ status: "error", message: err.message });
   }
 };

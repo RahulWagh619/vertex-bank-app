@@ -18,9 +18,8 @@ const btnTransfer = document.querySelector(".form__btn--transfer");
 const btnLoan = document.querySelector(".form__btn--loan");
 const btnClose = document.querySelector(".form__btn--close");
 const btnSort = document.querySelector(".btn--sort");
-
-const inputLoginUsername = document.querySelector(".login__input--user");
-const inputLoginPin = document.querySelector(".login__input--pin");
+const inputLoginUsername = document.querySelector("#login-user");
+const inputLoginPin = document.querySelector("#login-pin");
 const inputTransferTo = document.querySelector(".form__input--to");
 const inputTransferAmount = document.querySelector(".form__input--amount");
 const inputTransferPin = document.querySelector(".form__input--transfer-pin");
@@ -28,7 +27,25 @@ const inputLoanAmount = document.querySelector(".form__input--loan-amount");
 const inputLoanPin = document.querySelector(".form__input--loan-pin");
 const inputCloseUsername = document.querySelector(".form__input--user");
 const inputClosePin = document.querySelector(".form__input--pin");
+const screenHome = document.querySelector("#screen-home");
+const screenSignup = document.querySelector("#screen-signup");
+const screenLogin = document.querySelector("#screen-login");
 
+// Navigation Triggers
+const btnGoToLogin = document.querySelector("#btn-go-to-login");
+const btnGoToSignup = document.querySelector("#btn-go-to-signup");
+const btnBackButtons = document.querySelectorAll(".btn-back");
+
+// Signup Submissions
+const inputSignupName = document.querySelector("#signup-name");
+const inputSignupUsername = document.querySelector("#signup-user");
+const inputSignupPin = document.querySelector("#signup-pin");
+const btnSubmitSignup = document.querySelector("#btn-submit-signup");
+
+// Login Submissions
+// const inputLoginUsername = document.querySelector("#login-user");
+// const inputLoginPin = document.querySelector("#login-pin");
+const btnSubmitLogin = document.querySelector("#btn-submit-login");
 // --- STATE ---
 let currentAccount, timer;
 let sorted = false;
@@ -179,70 +196,120 @@ const startLogOutTimer = function () {
 };
 
 // --- EVENT HANDLERS ---
+// btnSignup.addEventListener("click", async function (e) {
+//   e.preventDefault();
 
-btnLogin.addEventListener("click", async function (e) {
-  e.preventDefault();
+//   const name = inputSignupName.value;
+//   const username = inputSignupUsername.value;
+//   const pin = inputSignupPin.value;
 
-  const username = inputLoginUsername.value;
-  const pin = inputLoginPin.value;
+//   // Basic frontend validation
+//   if (!name || !username || !pin) {
+//     alert("Please fill out all fields to create an account.");
+//     return;
+//   }
 
-  if (!username || !pin) {
-    alert("Please enter both username and PIN");
-    return;
-  }
+//   if (pin.length !== 4 || isNaN(Number(pin))) {
+//     alert("PIN must be exactly a 4-digit number.");
+//     return;
+//   }
 
-  try {
-    console.log("Attempting login at:", `${API_URL}/login`);
+//   try {
+//     // 🌍 Assuming your backend route is /signup or /register
+//     const response = await fetch(`${API_URL}/signup`, {
+//       method: "POST",
+//       headers: {
+//         "Content-Type": "application/json",
+//       },
+//       body: JSON.stringify({
+//         name: name,
+//         username: username,
+//         pin: pin,
+//       }),
+//     });
 
-    const response = await fetch(`${API_URL}/login`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        username: username,
-        pin: pin,
-      }),
-      // 'include' is used if your backend sends cookies,
-      // but we will also store the token manually for headers.
-      credentials: "include",
-    });
+//     const data = await response.json();
 
-    const data = await response.json();
+//     if (data.status === "success") {
+//       alert("Account successfully created! 🎉 You can now log in.");
 
-    if (data.status === "success") {
-      // 🛡️ 1. SAVE THE SECURITY TOKEN
-      // This is the "Key" we will show the server for Transfers/Loans
-      localStorage.setItem("jwt", data.token);
+//       // Clear signup inputs
+//       inputSignupName.value =
+//         inputSignupUsername.value =
+//         inputSignupPin.value =
+//           "";
+//     } else {
+//       // Handles backend validation errors (e.g., "Username already taken")
+//       alert(data.message || "Registration failed.");
+//     }
+//   } catch (err) {
+//     console.error("Signup Error 💥", err);
+//     alert("Could not connect to the server. Please try again.");
+//   }
+// });
+// btnLogin.addEventListener("click", async function (e) {
+//   e.preventDefault();
 
-      // 2. SET THE CURRENT ACCOUNT
-      currentAccount = data.data.user;
+//   const username = inputLoginUsername.value;
+//   const pin = inputLoginPin.value;
 
-      // 3. UI UPDATES
-      labelWelcome.textContent = `Welcome back, ${currentAccount.name.split(" ")[0]}`;
-      containerApp.style.opacity = 1; // Show the app
+//   if (!username || !pin) {
+//     alert("Please enter both username and PIN");
+//     return;
+//   }
 
-      // 4. CLEAR INPUTS & FOCUS
-      inputLoginUsername.value = inputLoginPin.value = "";
-      inputLoginPin.blur();
+//   try {
+//     console.log("Attempting login at:", `${API_URL}/login`);
 
-      // 5. INITIALIZE APP STATE
-      if (timer) clearInterval(timer);
-      timer = startLogOutTimer();
+//     const response = await fetch(`${API_URL}/login`, {
+//       method: "POST",
+//       headers: {
+//         "Content-Type": "application/json",
+//       },
+//       body: JSON.stringify({
+//         username: username,
+//         pin: pin,
+//       }),
+//       // 'include' is used if your backend sends cookies,
+//       // but we will also store the token manually for headers.
+//       credentials: "include",
+//     });
 
-      // Update the balance, movements, and summary
-      updateUI(currentAccount);
+//     const data = await response.json();
 
-      console.log("Login successful! Token saved to localStorage.");
-    } else {
-      // Show the specific error from your backend (e.g., "Incorrect PIN")
-      alert(data.message || "Login failed");
-    }
-  } catch (err) {
-    console.error("Connection Error 💥", err);
-    alert("Could not connect to the bank server. Please try again later.");
-  }
-});
+//     if (data.status === "success") {
+//       // 🛡️ 1. SAVE THE SECURITY TOKEN
+//       // This is the "Key" we will show the server for Transfers/Loans
+//       localStorage.setItem("jwt", data.token);
+
+//       // 2. SET THE CURRENT ACCOUNT
+//       currentAccount = data.data.user;
+
+//       // 3. UI UPDATES
+//       labelWelcome.textContent = `Welcome back, ${currentAccount.name.split(" ")[0]}`;
+//       containerApp.style.opacity = 1; // Show the app
+
+//       // 4. CLEAR INPUTS & FOCUS
+//       inputLoginUsername.value = inputLoginPin.value = "";
+//       inputLoginPin.blur();
+
+//       // 5. INITIALIZE APP STATE
+//       if (timer) clearInterval(timer);
+//       timer = startLogOutTimer();
+
+//       // Update the balance, movements, and summary
+//       updateUI(currentAccount);
+
+//       console.log("Login successful! Token saved to localStorage.");
+//     } else {
+//       // Show the specific error from your backend (e.g., "Incorrect PIN")
+//       alert(data.message || "Login failed");
+//     }
+//   } catch (err) {
+//     console.error("Connection Error 💥", err);
+//     alert("Could not connect to the bank server. Please try again later.");
+//   }
+// });
 
 btnTransfer.addEventListener("click", async function (e) {
   e.preventDefault();
@@ -375,4 +442,114 @@ btnSort.addEventListener("click", function (e) {
 
   // Re-run the UI update with the new sort state
   displayMovements(currentAccount, sorted);
+});
+btnGoToLogin.addEventListener("click", function () {
+  screenHome.classList.add("hidden");
+  screenLogin.classList.remove("hidden");
+  inputLoginUsername.focus();
+});
+
+btnGoToSignup.addEventListener("click", function () {
+  screenHome.classList.add("hidden");
+  screenSignup.classList.remove("hidden");
+  inputSignupName.focus();
+});
+
+// Bind all back buttons to return to the selection menu
+btnBackButtons.forEach((btn) => {
+  btn.addEventListener("click", function () {
+    screenSignup.classList.add("hidden");
+    screenLogin.classList.add("hidden");
+    screenHome.classList.remove("hidden");
+  });
+});
+
+// ==========================================
+// 3. SECURE SIGNUP ENGINE (POST)
+// ==========================================
+btnSubmitSignup.addEventListener("click", async function (e) {
+  e.preventDefault();
+
+  const name = inputSignupName.value;
+  const username = inputSignupUsername.value;
+  const pin = inputSignupPin.value;
+
+  if (!name || !username || !pin) {
+    alert("Please fill out all fields to register.");
+    return;
+  }
+
+  try {
+    const response = await fetch(`${API_URL}/signup`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name, username, pin }),
+    });
+
+    const data = await response.json();
+
+    if (data.status === "success") {
+      alert("Account successfully created! 🎉 Redirecting to options menu.");
+
+      // Clear signup inputs safely
+      inputSignupName.value =
+        inputSignupUsername.value =
+        inputSignupPin.value =
+          "";
+
+      // Flip layout state back to gateway
+      screenSignup.classList.add("hidden");
+      screenHome.classList.remove("hidden");
+    } else {
+      alert(data.message || "Registration failed.");
+    }
+  } catch (err) {
+    console.error("Signup Error:", err);
+    alert("Could not process registration with Render server.");
+  }
+});
+
+// ==========================================
+// 4. SECURE LOGIN ENGINE (POST)
+// ==========================================
+btnSubmitLogin.addEventListener("click", async function (e) {
+  e.preventDefault();
+
+  const username = inputLoginUsername.value;
+  const pin = inputLoginPin.value;
+
+  try {
+    const response = await fetch(`${API_URL}/login`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ username, pin }),
+      credentials: "include",
+    });
+
+    const data = await response.json();
+
+    if (data.status === "success") {
+      // Set localized session asset
+      localStorage.setItem("jwt", data.token);
+      currentAccount = data.data.user;
+
+      // Transition layouts cleanly
+      screenLogin.classList.add("hidden");
+      containerApp.style.opacity = 1; // Reveal the workspace dashboard safely
+      labelWelcome.classList.remove("hidden");
+      // Clear inputs
+      inputLoginUsername.value = inputLoginPin.value = "";
+      inputLoginPin.blur();
+
+      // Fire state hooks
+      labelWelcome.textContent = `Welcome back, ${currentAccount.name.split(" ")[0]}`;
+      if (timer) clearInterval(timer);
+      timer = startLogOutTimer();
+      updateUI(currentAccount);
+    } else {
+      alert(data.message || "Authentication failed.");
+    }
+  } catch (err) {
+    alert(`Could not complete credentials handshake: ${err.message}`);
+  }
 });
