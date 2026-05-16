@@ -3,7 +3,8 @@
 Vertex Bank is a secure, full-stack, state-driven Single Page Application (SPA) designed to simulate modern retail banking features. The application features independent frontend and backend architectures securely cross-communicating across distinct cloud hosting environments.
 
 🌐 **Live Demo:** [View Live Frontend on Vercel](https://vertex-bank-frontend.vercel.app) 
-<img width="1918" height="967" alt="Screenshot 2026-05-17 002620" src="https://github.com/user-attachments/assets/88435bf9-b846-4446-97f6-e270c791b6cd" />
+<img width="1900" height="987" alt="image" src="https://github.com/user-attachments/assets/7eb066b8-d891-4dd5-b513-6ddd21ba8784" />
+
 
 <img width="1893" height="987" alt="Screenshot 2026-05-17 002643" src="https://github.com/user-attachments/assets/e3cbbf7a-6779-43e4-a8b1-0cb5d065fc8f" />
 
