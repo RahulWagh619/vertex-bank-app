@@ -415,3 +415,152 @@ h2 {
 .form--loan {
   grid-template-columns: 1fr 0.6fr 120px !important;
 }
+.hidden {
+  display: none !important;
+}
+
+/* Logo Presentation */
+.auth-logo {
+  height: 80px;
+  width: auto;
+  margin-bottom: 25px;
+  animation: fadeIn 0.8s ease-out;
+}
+
+/* Scaled Typography */
+.auth-container h2 {
+  font-size: 3.2rem;
+  font-weight: 600;
+  color: #ffffff;
+  margin-bottom: 25px; /* 🎯 Distinct vertical gap below the title */
+}
+
+.auth-container p {
+  font-size: 1.8rem;
+  color: #e0e0e0;
+  margin-bottom: 40px; /* 🎯 Pushes the buttons/forms well below description text */
+}
+
+/* Button Layout Container */
+.auth-buttons {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+}
+
+/* Premium Button Styling Integration */
+.nav-btn {
+  background-color: #fff;
+  color: #333;
+  border: 2px solid #333;
+  padding: 12px 30px;
+  font-size: 1.6rem;
+  font-weight: 500;
+  font-family: inherit;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.nav-btn:hover {
+  background-color: #333;
+  color: #fff;
+  transform: translateY(-2px);
+}
+
+.nav-btn:active {
+  transform: translateY(0);
+}
+.signup-form,
+.login-form {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  gap: 20px; /* 🚀 Expanded gap between user, pin, and submit actions */
+}
+
+/* 🚀 The Primary Submit Buttons (Login & Sign Up) */
+.action-btn {
+  width: 100%;
+  background-color: #333;
+  color: #fff;
+  border: none;
+  padding: 14px; /* Increased vertical padding for a substantial, solid feel */
+  font-size: 1.8rem; /* Scaled up text */
+  font-weight: 500;
+  font-family: inherit;
+  border-radius: 10px;
+  cursor: pointer;
+  margin-top: 10px;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+}
+
+.action-btn:hover {
+  background-color: #444;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+}
+
+.action-btn:active {
+  transform: translateY(0);
+}
+
+/* ↩️ The "Back" Buttons */
+.btn-back {
+  width: 100%; /* 🚀 Stretches it to match the inputs and action button perfectly */
+  background-color: #fff; /* Inverted background so it looks secondary */
+  color: #333;
+  border: 2px solid #333; /* Clean, crisp border matching the gateway buttons */
+  padding: 14px; /* 🎯 Character-perfect padding match to .action-btn */
+  font-size: 1.8rem; /* Identical font size for symmetry */
+  font-weight: 500;
+  font-family: inherit;
+  border-radius: 12px; /* Matches your spacious input corner tracks */
+  cursor: pointer;
+  margin-top: 15px; /* Balanced breathing room below the form */
+  transition: all 0.3s ease;
+  box-sizing: border-box; /* Prevents border from shifting the layout width */
+  display: block;
+  text-align: center;
+}
+
+/* Smooth hover animations to make it feel highly interactive */
+.btn-back:hover {
+  background-color: #f5f5f5;
+  transform: translateY(-2px);
+  color: #000;
+}
+
+.btn-back:active {
+  transform: translateY(0);
+}
+.auth-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 50px 30px; /* More internal breathing room */
+  margin: 80px auto 0 auto;
+  max-width: 460px; /* 🚀 Increased width so fields feel spacious, not cramped */
+  width: 100%;
+}
+.login__input {
+  width: 100%; /* Forces input to match the new wide container footprint */
+  padding: 16px 20px; /* 🚀 Generous vertical and horizontal inner padding */
+  font-size: 1.6rem;
+  border: 1px solid #e0e0e0;
+  border-radius: 12px; /* Smooth rounded tracking */
+  background-color: #ffffff !important; /* White input box */
+  color: #222222 !important;
+  font-family: inherit;
+  transition: all 0.3s ease;
+  box-sizing: border-box; /* Secures structural padding calculation */
+}
+.login__input:focus {
+  outline: none;
+  border-color: #333;
+  background-color: #fff;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+}
