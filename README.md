@@ -1,61 +1,162 @@
 # 🏦 Vertex Bank
 
-Vertex Bank is a secure, full-stack, state-driven Single Page Application (SPA) designed to simulate modern retail banking features. The application features independent frontend and backend architectures securely cross-communicating across distinct cloud hosting environments.
+Vertex Bank is a secure, full-stack **Single Page Application (SPA)** that simulates core retail banking operations. It features a decoupled frontend and backend architecture, with the client and server deployed independently and communicating securely through REST APIs.
 
-🌐 **Live Demo:** [View Live Frontend on Vercel](https://vertex-bank-frontend.vercel.app) 
-<img width="1900" height="987" alt="image" src="https://github.com/user-attachments/assets/7eb066b8-d891-4dd5-b513-6ddd21ba8784" />
+🌐 **Live Demo:** https://vertex-bank-frontend.vercel.app
 
+---
 
-<img width="1893" height="987" alt="Screenshot 2026-05-17 002643" src="https://github.com/user-attachments/assets/e3cbbf7a-6779-43e4-a8b1-0cb5d065fc8f" />
+## 📸 Screenshots
 
-<img width="1893" height="982" alt="Screenshot 2026-05-17 002703" src="https://github.com/user-attachments/assets/cdafabcd-44c8-4912-8330-2a269bef2025" />
+<img width="1900" height="987" alt="Homepage" src="https://github.com/user-attachments/assets/7eb066b8-d891-4dd5-b513-6ddd21ba8784" />
 
-<img width="1907" height="987" alt="image" src="https://github.com/user-attachments/assets/63ff12e5-d11d-464b-b028-4453c88ff19f" />
+<img width="1893" height="987" alt="Dashboard" src="https://github.com/user-attachments/assets/e3cbbf7a-6779-43e4-a8b1-0cb5d065fc8f" />
 
+<img width="1893" height="982" alt="Transactions" src="https://github.com/user-attachments/assets/cdafabcd-44c8-4912-8330-2a269bef2025" />
 
-## 🚀 Key Features
+<img width="1907" height="987" alt="Authentication" src="https://github.com/user-attachments/assets/63ff12e5-d11d-464b-b028-4453c88ff19f" />
 
-- **State-Driven Multi-View Gateway:** A fluid, framework-free Single Page Application (SPA) layout that utilizes a state-switching engine to transition between Home, Login, and Signup menus cleanly.
-- **Secure Authentication Pipeline:** State-aware user onboarding via a custom registration pipeline and secure login utilizing JSON Web Tokens (JWT) for persistent state management (`localStorage`).
-- **Real-Time Core Banking Ledger:** Complete transaction engine running calculations for client balances, active money transfers, dynamic loan processing, and dynamic sorting of account statements.
-- **Account Termination Lifecycle:** Standardized `DELETE` endpoint functionality allowing authenticated users to permanently close accounts, handling client-side session purges automatically.
+---
 
+# 🚀 Features
 
-## 🛠️ Tech Stack
+- **Single Page Application (SPA):** Framework-free SPA with seamless navigation between Home, Login, Signup, and Dashboard views using client-side state management.
+- **JWT Authentication:** Secure user registration and login with JSON Web Tokens (JWT) for authenticated API access and persistent user sessions.
+- **Banking Operations:** Deposit, withdraw, transfer funds, request loans, sort transactions, and view real-time account balances.
+- **Account Management:** Authenticated users can permanently delete their accounts through protected API endpoints.
+- **Responsive UI:** Clean and responsive interface built with modern HTML, CSS, and JavaScript.
 
-**Frontend:**
-- HTML5 & CSS3 (Advanced Grid, Flexbox layouts, responsive design)
-- Vanilla JavaScript (Asynchronous ES6+ Fetch API, DOM manipulation, state routing)
-- Hosted on: **Vercel**
+---
 
-**Backend:**
-- Node.js & Express.js (RESTful API design, specialized router controllers)
-- MongoDB Atlas & Mongoose (Document-based data validation and modeling)
-- Hosted on: **Render**
+# 🛠️ Tech Stack
 
+## Frontend
 
-## 🛡️ Production Security & Architecture
+- HTML5
+- CSS3 (Grid & Flexbox)
+- Vanilla JavaScript (ES6+, Fetch API, DOM Manipulation)
+- Hosted on **Vercel**
 
-One of the major milestones of this project was engineering a secure cross-origin ecosystem across cloud servers:
+## Backend
 
-1. **Origin-Aware CORS Middleware:** Configured the Node.js backend to reject generic wildcards and explicitly whitelist the production Vercel DOM client, handling complex preflight `OPTIONS` requests gracefully.
-2. **Bearer Token Authorization:** Standardized network protocol headers by injecting JWT keys (`Authorization: Bearer <token>`) to protect administrative and account-destructive (`DELETE`) API routes.
-3. **Decoupled Architecture:** Client data manifests are transmitted solely via encrypted JSON payloads, insulating the core infrastructure from direct database access vulnerabilities.
+- Node.js
+- Express.js
+- MongoDB Atlas
+- Mongoose
+- Hosted on **Render**
 
+---
 
- 📖 API Documentation & Endpoints
+# 🛡️ Security & Architecture
 
-All request and response payloads communicate via standardized JSON. Protected routes require a valid JWT passed in the request header: `Authorization: Bearer <TOKEN>`.
+The application follows a decoupled frontend-backend architecture with secure communication between independently hosted services.
 
- Authentication Endpoints
+### Secure CORS Configuration
 
-🔐 Register a New User
-* **Endpoint:** `POST /api/users/signup`
-* **Headers:** `Content-Type: application/json`
-* **Body Payload:**
-  ```json
-  {
-    "name": "Alex Mercer",
-    "username": "alexm",
-    "pin": 1111
-  }
+- Backend explicitly whitelists the production frontend origin.
+- Handles CORS preflight (`OPTIONS`) requests correctly.
+- Prevents unauthorized cross-origin requests.
+
+### JWT-Based Authorization
+
+Protected routes require a valid JWT in the request header.
+
+```http
+Authorization: Bearer <TOKEN>
+```
+
+### REST API
+
+- Stateless API design
+- JSON request/response format
+- Secure communication between client and server
+
+---
+
+# 📖 API Endpoints
+
+All requests and responses use JSON.
+
+---
+
+## Authentication
+
+### Register
+
+```http
+POST /api/users/signup
+```
+
+Headers
+
+```http
+Content-Type: application/json
+```
+
+Request Body
+
+```json
+{
+  "name": "Alex Mercer",
+  "username": "alexm",
+  "pin": 1111
+}
+```
+
+---
+
+### Login
+
+```http
+POST /api/users/login
+```
+
+Request Body
+
+```json
+{
+  "username": "alexm",
+  "pin": 1111
+}
+```
+
+---
+
+## Protected Routes
+
+These endpoints require:
+
+```http
+Authorization: Bearer <TOKEN>
+```
+
+Examples include:
+
+- View account details
+- Transfer money
+- Request loans
+- Delete account
+
+---
+
+# 🌐 Deployment
+
+**Frontend**
+
+- Vercel
+
+**Backend**
+
+- Render
+
+**Database**
+
+- MongoDB Atlas
+
+---
+
+# 👨‍💻 Author
+
+**Rahul Wagh**
+
+Vertex Bank was built to explore secure authentication, REST API development, state management, and full-stack web application architecture using the MERN ecosystem.
