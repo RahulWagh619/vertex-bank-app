@@ -61,19 +61,17 @@ app.use("/api/users/signup", authLimiter);
 app.use(express.json({ limit: "10kb" }));
 app.use(cookieParser());
 
-// 🛡️ 4. DATA SANITIZATION (NoSQL Injection)
-app.use(
-  mongoSanitize({
-    allowDots: true,
-    replaceWith: "_",
-    hasQueryString: false,
-  }),
-);
+// 🛡️ 4. SAFE MANUAL DATA SANITIZATION (Bypasses read-only req.query bug)
+app.use((req, res, next) => {
+  if (req.body) mongoSanitize.sanitize(req.body);
+  if (req.params) mongoSanitize.sanitize(req.params);
+  next();
+});
 
 // 🛣️ 5. ROUTES
 app.use("/api/users", userRouter);
 
-// 🚨 6. GLOBAL ERROR HANDLING MIDDLEWARE (Must be before module.exports)
+// 🚨 6. GLOBAL ERROR HANDLING MIDDLEWARE (Must be last before module.exports)
 app.use((err, req, res, next) => {
   res.status(err.statusCode || 500).json({
     status: "error",
