@@ -1,23 +1,28 @@
 const express = require("express");
 const mongoSanitize = require("express-mongo-sanitize");
-const userRouter = require("./routes/userRoutes");
 const helmet = require("helmet");
 const rateLimit = require("express-rate-limit");
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
+
+const userRouter = require("./routes/userRoutes");
+
 const app = express();
+
+// 🌐 Enable reverse proxy trust for Render
+app.set("trust proxy", 1);
 
 // 🛡️ 1. SECURITY HEADERS & CORS FIRST
 const allowedOrigins = [
   "http://127.0.0.1:5500",
-  "http://127.0.0.1:5501", // Your current local port
-  "https://vertex-bank-frontend.vercel.app", // Your live Vercel link
+  "http://127.0.0.1:5501", // Local dev port
+  "https://vertex-bank-frontend.vercel.app", // Live Vercel frontend
 ];
 
 app.use(
   cors({
     origin: function (origin, callback) {
-      // Allow requests with no origin (like mobile apps or postman)
+      // Allow requests with no origin (e.g., Postman, mobile)
       if (!origin) return callback(null, true);
 
       if (allowedOrigins.indexOf(origin) === -1) {
@@ -30,9 +35,10 @@ app.use(
     },
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
-    credentials: true, // 👈 THIS must be true to match your frontend
+    credentials: true,
   }),
 );
+
 app.use(helmet());
 
 // 🛡️ 2. RATE LIMITING (Prevents Brute Force)
@@ -47,30 +53,31 @@ const authLimiter = rateLimit({
   legacyHeaders: false,
 });
 
-// Apply limiter only to auth routes
+// Apply rate limiter specifically to auth endpoints
 app.use("/api/users/login", authLimiter);
 app.use("/api/users/signup", authLimiter);
 
-// 📦 3. BODY PARSER
+// 📦 3. BODY PARSERS
 app.use(express.json({ limit: "10kb" }));
-// app.use(mongoSanitize());
 app.use(cookieParser());
 
-// 🛡️ 4. DATA SANITIZATION (The Fix)
-// We tell it to allowDots to avoid the "read-only" property crash on some systems
-// app.use(
-//   mongoSanitize({
-//     allowDots: true,
-//     replaceWith: '_',
-//   }),
-// );
+// 🛡️ 4. DATA SANITIZATION (NoSQL Injection)
+app.use(
+  mongoSanitize({
+    allowDots: true,
+    replaceWith: "_",
+  }),
+);
+
 // 🛣️ 5. ROUTES
 app.use("/api/users", userRouter);
 
-module.exports = app;
+// 🚨 6. GLOBAL ERROR HANDLING MIDDLEWARE (Must be before module.exports)
 app.use((err, req, res, next) => {
   res.status(err.statusCode || 500).json({
     status: "error",
     message: err.message || "Something went very wrong!",
   });
 });
+
+module.exports = app;
