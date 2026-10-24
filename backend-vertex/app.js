@@ -66,6 +66,7 @@ app.use(
   mongoSanitize({
     allowDots: true,
     replaceWith: "_",
+    hasQueryString: false,
   }),
 );
 
